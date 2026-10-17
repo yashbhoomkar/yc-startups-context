@@ -32,7 +32,7 @@ jobs:
         run: python scripts/build_dataset.py
       - name: Commit changes
         run: |
-          if git diff --quiet -- data/; then
+          if [ -z "$(git status --porcelain -- data/)" ]; then
             echo "Dataset is unchanged."
             exit 0
           fi
