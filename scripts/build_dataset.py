@@ -56,7 +56,7 @@ def batch_year(batch: Any) -> int | None:
     short_year = int(match.group(1))
     # YC batch labels use two-digit years; avoid treating unrelated strings as years.
     year = 2000 + short_year if short_year <= 79 else 1900 + short_year
-    if not re.search(r"(?i)(winter|summer|spring|fall|autumn|\bW\b|\bS\b|\bF\b|\bSP\b|\bSU\b|\bWI\b|\bFA\b)", value):
+    if not re.search(r"(?i)(winter|summer|spring|fall|autumn|^(?:W|S|F|SP|SU|WI|FA)\s*\d)", value):
         return None
     return year
 
