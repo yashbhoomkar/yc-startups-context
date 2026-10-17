@@ -36,9 +36,9 @@ Requires Python 3.10+; no third-party packages are required.
 python scripts/build_dataset.py
 ```
 
-The script fetches the upstream API, selects batches from 2022–2026, normalizes records, and writes CSV, JSON, yearly extracts, and metadata into `data/`.
+The script fetches the upstream API, selects batches from 2022–2026, normalizes records, and writes CSV, JSON, yearly extracts, and metadata into `data/`. Then `scripts/enrich_dataset.py` generates an enriched dataset, rule-based product/business-model categories, and a research queue for founders, funding, investors, and revenue.
 
-## Automation
+## Enrichment layer\n\n- `data/companies_enriched.csv` and `data/companies_enriched.json` add derived product categories and business-model labels to the master dataset.\n- `data/enrichment_queue.csv` creates per-company research links for founders, funding rounds, investors, and revenue estimates.\n- `data/enrichment_metadata.json` records coverage and the evidence policy.\n\n**Evidence policy:** Founder names, funding amounts, investors, and revenue estimates are not guessed. These fields remain empty until a verifiable public source is reviewed and recorded. Derived product categories are heuristic labels based on YC taxonomy and are explicitly marked as derived. Search links are discovery aids, not evidence.\n\n## Automation
 
 GitHub Actions can refresh the dataset on a schedule or manually via **Actions → Update YC dataset → Run workflow**. Generated data changes are committed only when the files differ.
 
