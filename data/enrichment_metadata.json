@@ -1,0 +1,40 @@
+{
+  "generated_at_utc": "2026-10-17T13:00:21.790516+00:00",
+  "input": "data/companies.json",
+  "companies_enriched": 3102,
+  "outputs": [
+    "data/companies_enriched.csv",
+    "data/companies_enriched.json",
+    "data/enrichment_queue.csv"
+  ],
+  "automatically_derived_fields": [
+    "product_category_derived",
+    "business_model_derived"
+  ],
+  "manual_evidence_fields": [
+    "founders_public",
+    "funding_total_usd",
+    "funding_last_round",
+    "funding_last_round_date",
+    "investors",
+    "revenue_estimate_usd"
+  ],
+  "evidence_policy": "Do not enter founder, funding, investor, or revenue claims without a source URL. Leave unknowns empty. Do not treat search-result snippets as verified evidence.",
+  "category_counts": {
+    "AI / machine learning": 1241,
+    "B2B": 388,
+    "Climate, energy & agriculture": 10,
+    "Commerce & marketplaces": 50,
+    "Consumer": 58,
+    "Developer infrastructure & tools": 592,
+    "Education & learning": 21,
+    "Financial technology": 285,
+    "Government": 10,
+    "Healthcare & life sciences": 170,
+    "Industrial & hard tech": 191,
+    "Logistics & mobility": 28,
+    "Real estate & construction": 28,
+    "Security & compliance": 30
+  },
+  "coverage_note": "Product category and business model are heuristic labels derived from YC taxonomy, not independently verified descriptions. Founder, funding, investor and revenue facts remain pending source verification."
+}
