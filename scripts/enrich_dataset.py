@@ -23,6 +23,7 @@ OUTPUT_JSON = DATA_DIR / "companies_enriched.json"
 OUTPUT_CSV = DATA_DIR / "companies_enriched.csv"
 QUEUE_CSV = DATA_DIR / "enrichment_queue.csv"
 META = DATA_DIR / "enrichment_metadata.json"
+VERIFIED = DATA_DIR / "verified_enrichment.csv"
 
 ADDITIONAL_FIELDS = [
     "product_category_derived",
@@ -31,8 +32,10 @@ ADDITIONAL_FIELDS = [
     "founders_public",
     "funding_total_usd",
     "funding_last_round",
+    "funding_last_round_amount_usd",
     "funding_last_round_date",
     "investors",
+    "investors_source_url",
     "revenue_estimate_usd",
     "revenue_estimate_as_of",
     "founders_source_url",
@@ -118,6 +121,20 @@ def main():
     if not isinstance(companies, list) or not companies:
         raise SystemExit("Input dataset is empty or invalid; refusing to overwrite enrichment outputs")
 
+    verified_by_name = {}
+    if VERIFIED.exists():
+        with VERIFIED.open("r", encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                key = (row.get("company") or "").strip().casefold()
+                if key:
+                    if key in verified_by_name:
+                        raise SystemExit(f"Duplicate company in {VERIFIED}: {row.get('company')}")
+                    if row.get("verification_status") != "verified":
+                        raise SystemExit(f"Unverified record in {VERIFIED}: {row.get('company')}")
+                    if not row.get("yc_profile_url") or not row.get("founders_source_url") or not row.get("funding_source_url"):
+                        raise SystemExit(f"Missing required evidence URL in {VERIFIED}: {row.get('company')}")
+                    verified_by_name[key] = row
+
     enriched = []
     queue = []
     for source in companies:
@@ -132,8 +149,10 @@ def main():
             "founders_public": "",
             "funding_total_usd": "",
             "funding_last_round": "",
+            "funding_last_round_amount_usd": "",
             "funding_last_round_date": "",
             "investors": "",
+            "investors_source_url": "",
             "revenue_estimate_usd": "",
             "revenue_estimate_as_of": "",
             "founders_source_url": "",
@@ -146,6 +165,25 @@ def main():
             "revenue_research_url": query_url(source, "revenue"),
             "investor_research_url": query_url(source, "investors"),
         })
+        evidence = verified_by_name.get((company.get("name") or "").strip().casefold())
+        if evidence:
+            company["founders_public"] = evidence.get("founders_public", "")
+            round_label = evidence.get("funding_last_round", "")
+            amount = evidence.get("funding_amount_usd", "")
+            if round_label.startswith("Disclosed total funding"):
+                company["funding_total_usd"] = amount
+                company["funding_last_round"] = ""
+                company["funding_last_round_amount_usd"] = ""
+            else:
+                company["funding_last_round"] = round_label
+                company["funding_last_round_amount_usd"] = amount
+            company["funding_last_round_date"] = evidence.get("funding_date", "")
+            company["investors"] = evidence.get("investors", "")
+            company["founders_source_url"] = evidence.get("founders_source_url", "")
+            company["funding_source_url"] = evidence.get("funding_source_url", "")
+            company["investors_source_url"] = evidence.get("investors_source_url", "")
+            company["enrichment_status"] = "verified_partial"
+            company["enrichment_notes"] = evidence.get("notes", "")
         enriched.append(company)
         queue.append({
             "name": company.get("name", ""),
@@ -155,19 +193,20 @@ def main():
             "website": company.get("website", ""),
             "product_category_derived": category,
             "business_model_derived": model,
-            "founders_public": "",
-            "founders_source_url": "",
-            "funding_total_usd": "",
-            "funding_last_round": "",
-            "funding_last_round_date": "",
-            "funding_source_url": "",
-            "investors": "",
-            "investor_source_url": "",
+            "founders_public": company.get("founders_public", ""),
+            "founders_source_url": company.get("founders_source_url", ""),
+            "funding_total_usd": company.get("funding_total_usd", ""),
+            "funding_last_round": company.get("funding_last_round", ""),
+            "funding_last_round_amount_usd": company.get("funding_last_round_amount_usd", ""),
+            "funding_last_round_date": company.get("funding_last_round_date", ""),
+            "funding_source_url": company.get("funding_source_url", ""),
+            "investors": company.get("investors", ""),
+            "investor_source_url": company.get("investors_source_url", ""),
             "revenue_estimate_usd": "",
             "revenue_estimate_as_of": "",
             "revenue_source_url": "",
-            "research_status": "pending",
-            "notes": "",
+            "research_status": company.get("enrichment_status", "pending_source_verification"),
+            "notes": company.get("enrichment_notes", ""),
             "founder_research_url": query_url(source, "founders"),
             "funding_research_url": query_url(source, "funding"),
             "investor_research_url": query_url(source, "investors"),
@@ -195,10 +234,12 @@ def main():
         "companies_enriched": len(enriched),
         "outputs": ["data/companies_enriched.csv", "data/companies_enriched.json", "data/enrichment_queue.csv"],
         "automatically_derived_fields": ["product_category_derived", "business_model_derived"],
-        "manual_evidence_fields": ["founders_public", "funding_total_usd", "funding_last_round", "funding_last_round_date", "investors", "revenue_estimate_usd"],
+        "manual_evidence_fields": ["founders_public", "funding_total_usd", "funding_last_round", "funding_last_round_amount_usd", "funding_last_round_date", "investors", "revenue_estimate_usd"],
+        "verified_records_loaded": len(verified_by_name),
+        "verified_records_source": "data/verified_enrichment.csv",
         "evidence_policy": "Do not enter founder, funding, investor, or revenue claims without a source URL. Leave unknowns empty. Do not treat search-result snippets as verified evidence.",
         "category_counts": dict(sorted(category_counts.items())),
-        "coverage_note": "Product category and business model are heuristic labels derived from YC taxonomy, not independently verified descriptions. Founder, funding, investor and revenue facts remain pending source verification.",
+        "coverage_note": "Product category and business model are heuristic labels derived from YC taxonomy. Source-reviewed facts are merged from data/verified_enrichment.csv; all other founder, funding, investor and revenue fields remain blank pending source verification.",
     }
     META.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Enriched {len(enriched)} records; wrote CSV, JSON, research queue and metadata.")
