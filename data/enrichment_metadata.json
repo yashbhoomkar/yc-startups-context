@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-10-17T13:00:21.790516+00:00",
+  "generated_at_utc": "2026-10-17T13:10:08.911716+00:00",
   "input": "data/companies.json",
   "companies_enriched": 3102,
   "outputs": [
@@ -15,10 +15,13 @@
     "founders_public",
     "funding_total_usd",
     "funding_last_round",
+    "funding_last_round_amount_usd",
     "funding_last_round_date",
     "investors",
     "revenue_estimate_usd"
   ],
+  "verified_records_loaded": 8,
+  "verified_records_source": "data/verified_enrichment.csv",
   "evidence_policy": "Do not enter founder, funding, investor, or revenue claims without a source URL. Leave unknowns empty. Do not treat search-result snippets as verified evidence.",
   "category_counts": {
     "AI / machine learning": 1241,
@@ -36,5 +39,5 @@
     "Real estate & construction": 28,
     "Security & compliance": 30
   },
-  "coverage_note": "Product category and business model are heuristic labels derived from YC taxonomy, not independently verified descriptions. Founder, funding, investor and revenue facts remain pending source verification."
+  "coverage_note": "Product category and business model are heuristic labels derived from YC taxonomy. Source-reviewed facts are merged from data/verified_enrichment.csv; all other founder, funding, investor and revenue fields remain blank pending source verification."
 }
