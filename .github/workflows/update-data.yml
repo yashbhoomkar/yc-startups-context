@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/update-data.yml"
-      - "scripts/build_dataset.py"
+      - "scripts/build_dataset.py"\n      - "scripts/enrich_dataset.py"
   workflow_dispatch:
   schedule:
     - cron: "23 6 * * 1"
