@@ -2,31 +2,41 @@
 
 A reproducible, source-attributed dataset of publicly listed Y Combinator companies accepted into batches from **2022 through 2026**.
 
-The repository is designed to keep company descriptions and useful metadata in version control, with a repeatable update script and scheduled refreshes.
+The repository keeps company descriptions and useful metadata in version control, with repeatable update scripts and scheduled refreshes.
 
 ## Data
 
-After the first successful data refresh, generated files will be available under `data/`:
-
-- `companies.csv` — spreadsheet-friendly master dataset.
-- `companies.json` — normalized company records.
-- `batches/YYYY.csv` — per-batch-year extracts.
-- `metadata.json` — source, retrieval timestamp, row counts, and coverage notes.
+- `data/companies.csv` — spreadsheet-friendly master dataset.
+- `data/companies.json` — normalized company records.
+- `data/batches/YYYY.csv` — per-batch-year extracts.
+- `data/metadata.json` — source, retrieval timestamp, row counts, and coverage notes.
+- `data/companies_enriched.csv` / `data/companies_enriched.json` — derived product categories and business-model labels.
+- `data/enrichment_queue.csv` — per-company research queue and discovery links.
+- `data/verified_enrichment.csv` — source-backed founder and funding facts reviewed by a researcher, with field-specific evidence URLs.
 
 **Coverage caveat:** The upstream API covers publicly launched companies with YC company pages; it does not guarantee every company that ever participated in YC. This project records YC batch membership, not proof of a separately disclosed funding round in that same calendar year. Funding-round amounts are not inferred.
 
-## Data source
+## Data sources
 
 - YC Startup Directory: https://www.ycombinator.com/companies/
 - YC OSS API project and schema: https://github.com/yc-oss/api
 - All launched companies API: https://yc-oss.github.io/api/companies/all.json
 - API metadata: https://yc-oss.github.io/api/meta.json
 
-The upstream API is an unofficial, community-maintained dataset based on YC's public company directory. See its repository for provenance and schema details. This repository links back to source records and does not claim ownership of company descriptions or logos.
+The upstream API is an unofficial, community-maintained dataset based on YC's public company directory. This repository links back to source records and does not claim ownership of company descriptions or logos.
 
-## Fields
+## Enrichment and evidence policy
 
-The normalized records include company name, batch, description, one-liner, YC profile, company website, industries, subindustry, tags, locations, team size, status, stage, launch timestamp, and source URL where available. Missing source fields remain empty/null rather than being fabricated.
+The enrichment layer intentionally separates **derived classifications** from **verified facts**:
+
+- Product category and business-model labels are heuristic classifications based on YC taxonomy; they are not presented as official company claims.
+- The research queue contains discovery links, not evidence.
+- `data/verified_enrichment.csv` records source-backed founder and funding facts. Every row includes the YC profile and source URLs for the reported funding facts. Amounts are labeled as a round amount or total funding where the source allows that distinction.
+- Revenue values are left blank unless a reliable public source provides a sufficiently specific, dated metric. A funding announcement, valuation, hiring post, or vague growth claim is not treated as revenue.
+- Missing fields remain blank. Unknown founder surnames, round types, investor lists, and dates are not inferred.
+- Funding amounts are stored in USD. Dates refer to the announcement date when an exact round-close date is not public; notes describe material limitations.
+
+The verified file is an **initial researched tranche**, not a claim that all 3,102 companies have been individually researched. It will be expanded in batches and should be treated as a point-in-time record, not a live financial database.
 
 ## Refresh locally
 
@@ -34,13 +44,14 @@ Requires Python 3.10+; no third-party packages are required.
 
 ```bash
 python scripts/build_dataset.py
+python scripts/enrich_dataset.py
 ```
 
-The script fetches the upstream API, selects batches from 2022–2026, normalizes records, and writes CSV, JSON, yearly extracts, and metadata into `data/`. Then `scripts/enrich_dataset.py` generates an enriched dataset, rule-based product/business-model categories, and a research queue for founders, funding, investors, and revenue.
+The scripts fetch the upstream API, select batches from 2022–2026, normalize records, and write CSV, JSON, yearly extracts, metadata, derived classifications, and the research queue. The manually reviewed `verified_enrichment.csv` is maintained separately so routine refreshes do not overwrite source-reviewed facts.
 
-## Enrichment layer\n\n- `data/companies_enriched.csv` and `data/companies_enriched.json` add derived product categories and business-model labels to the master dataset.\n- `data/enrichment_queue.csv` creates per-company research links for founders, funding rounds, investors, and revenue estimates.\n- `data/enrichment_metadata.json` records coverage and the evidence policy.\n\n**Evidence policy:** Founder names, funding amounts, investors, and revenue estimates are not guessed. These fields remain empty until a verifiable public source is reviewed and recorded. Derived product categories are heuristic labels based on YC taxonomy and are explicitly marked as derived. Search links are discovery aids, not evidence.\n\n## Automation
+## Automation
 
-GitHub Actions can refresh the dataset on a schedule or manually via **Actions → Update YC dataset → Run workflow**. Generated data changes are committed only when the files differ.
+GitHub Actions refreshes the base dataset and derived enrichment on a schedule, manually via **Actions → Update YC dataset → Run workflow**, and when relevant scripts change. Generated data changes are committed only when files differ.
 
 ## License and attribution
 
