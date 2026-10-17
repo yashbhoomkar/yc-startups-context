@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a normalized YC startup dataset for batches 2022–2026.
+"""Build a normalized YC startup dataset for batches 2022–2026 (weekly-refreshable).
 
 Source: the community-maintained yc-oss/api public JSON endpoint.
 No company descriptions, funding amounts, or statuses are invented.
