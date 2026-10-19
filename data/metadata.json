@@ -1,7 +1,7 @@
 {
   "dataset": "YC Startups Context",
-  "generated_at_utc": "2026-10-17T13:10:41.826911+00:00",
-  "source_last_updated": "2026-10-17T02:13:02.766Z",
+  "generated_at_utc": "2026-10-19T13:36:34.812727+00:00",
+  "source_last_updated": "2026-10-19T02:28:57.356Z",
   "source_metadata_url": "https://yc-oss.github.io/api/meta.json",
   "source_companies_url": "https://yc-oss.github.io/api/companies/all.json",
   "scope": {
@@ -14,7 +14,7 @@
   "counts_by_batch": {
     "Fall 2024": 94,
     "Fall 2025": 145,
-    "Fall 2026": 146,
+    "Fall 2026": 147,
     "Spring 2025": 144,
     "Spring 2026": 192,
     "Summer 2022": 233,
@@ -26,7 +26,7 @@
     "Winter 2023": 274,
     "Winter 2024": 248,
     "Winter 2025": 166,
-    "Winter 2026": 198
+    "Winter 2026": 197
   },
   "coverage_note": "Upstream data includes publicly launched companies with YC directory pages; it may omit companies without public launch pages. Batch year indicates YC cohort, not necessarily an external funding-round year.",
   "fields": [
