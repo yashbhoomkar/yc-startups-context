@@ -1,7 +1,7 @@
 {
-  "generated_at_utc": "2026-10-19T13:36:35.473314+00:00",
+  "generated_at_utc": "2026-10-26T13:18:23.807629+00:00",
   "input": "data/companies.json",
-  "companies_enriched": 3102,
+  "companies_enriched": 3129,
   "outputs": [
     "data/companies_enriched.csv",
     "data/companies_enriched.json",
@@ -24,20 +24,20 @@
   "verified_records_source": "data/verified_enrichment.csv",
   "evidence_policy": "Do not enter founder, funding, investor, or revenue claims without a source URL. Leave unknowns empty. Do not treat search-result snippets as verified evidence.",
   "category_counts": {
-    "AI / machine learning": 1240,
-    "B2B": 388,
+    "AI / machine learning": 1257,
+    "B2B": 384,
     "Climate, energy & agriculture": 10,
     "Commerce & marketplaces": 50,
-    "Consumer": 58,
-    "Developer infrastructure & tools": 594,
-    "Education & learning": 20,
+    "Consumer": 55,
+    "Developer infrastructure & tools": 601,
+    "Education & learning": 21,
     "Financial technology": 285,
     "Government": 10,
-    "Healthcare & life sciences": 170,
-    "Industrial & hard tech": 191,
+    "Healthcare & life sciences": 172,
+    "Industrial & hard tech": 197,
     "Logistics & mobility": 28,
     "Real estate & construction": 28,
-    "Security & compliance": 30
+    "Security & compliance": 31
   },
   "coverage_note": "Product category and business model are heuristic labels derived from YC taxonomy. Source-reviewed facts are merged from data/verified_enrichment.csv; all other founder, funding, investor and revenue fields remain blank pending source verification."
 }
